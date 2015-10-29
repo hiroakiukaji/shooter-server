@@ -20,7 +20,7 @@ import (
 	"strings"
 	"time"
 	"upper.io/db"
-	_ "upper.io/db/mongo"
+	"upper.io/db/mongo"
 )
 
 type mark struct {
@@ -29,7 +29,7 @@ type mark struct {
 	Created time.Time `json:"-" bson:"created"`
 }
 
-var settings db.Settings
+var settings mongo.ConnectionURL
 var sess db.Database
 var scores db.Collection
 
@@ -41,22 +41,32 @@ const (
 func init() {
 	var err error
 
+	var mongoURI = ""
 	host := os.Getenv("MONGO_HOST")
+	uri := os.Getenv("MONGO_URI")
 
-	if host == "" {
-		host = defaultHost
-	}
+        if uri != "" {
+                mongoURI = uri
+        } else if host != "" {
+                mongoURI = host
+        } else {
+                mongoURI = defaultHost
+        }
 
-	settings = db.Settings{
-		Host:     host,
-		Database: defaultDatabase,
-	}
+	parsedURI, _ := mongo.ParseURL(mongoURI)
+
+        settings = mongo.ConnectionURL {
+                Address:  parsedURI.Address,
+                Database: parsedURI.Database,
+                User:     parsedURI.User,
+                Password: parsedURI.Password,
+        }
 
 	if sess, err = db.Open("mongo", settings); err != nil {
 		log.Fatal("db.Open: ", err)
 	}
 
-	log.Printf("Connected to mongo://%s/%s.\n", host, defaultDatabase)
+	log.Printf("Connected to mongo://%s.\n", mongoURI)
 
 	scores, err = sess.Collection("scores")
 	if err != nil {
