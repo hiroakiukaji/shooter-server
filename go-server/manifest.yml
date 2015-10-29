@@ -1,0 +1,11 @@
+---
+applications:
+- name: shooter-server
+  domain: 192.168.15.91.xip.io
+  buildpack: https://github.com/cloudfoundry/binary-buildpack#v1.0.1
+  memory: 16M
+  command: ./shooter-server -listen :$PORT 
+  env: 
+    MONGO_URI: "mongodb://ad55761d-bd50-40f1-ae0f-875cc1c92e96:password@192.168.15.91:27017/7f7607ab-db63-465a-95c9-2b2318c5d68d"
+  services:
+  - shooter-mongo
