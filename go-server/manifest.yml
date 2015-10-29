@@ -2,7 +2,7 @@
 applications:
 - name: shooter-server
   domain: 192.168.15.91.xip.io
-  buildpack: https://github.com/cloudfoundry/binary-buildpack#v1.0.1
+  buildpack: binary_buildpack
   memory: 16M
   command: ./shooter-server -listen :$PORT 
   env: 
